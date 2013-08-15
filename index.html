@@ -23,27 +23,38 @@
         */
 	function patientPlot(visits, problems, vitals) {
 		var graph={
-			nodes: [{name: "198", group: "Patient"}], 
+			nodes: [{name: visits.results[0].patient_name.label, group: "Patient"}], 
 			links: []
 		};
 
+		graph.nodes.push({name: "Visits", group:"Visits"});
+		graph.links.push({source:0, target:graph.nodes.length-1});
+
+		graph.nodes.push({name: "Problems", group:"Problems"});
+		graph.links.push({source:0, target:graph.nodes.length-1});
+
+		graph.nodes.push({name: "Vitals", group:"Vitals"});
+		graph.links.push({source:0, target:graph.nodes.length-1});
+
 		visits.results.forEach(function (d) {
+			d.name = d.encounter_type.value + "\n" + d.visit_admit_datetime.value;
 			d.group = "Visit";
 			graph.nodes.push(d);
-			graph.links.push({source:0, target:graph.nodes.length-1});
+			graph.links.push({source:1, target:graph.nodes.length-1});
 		});
 
 		problems.results.forEach(function (d) {
+			d.name = d.diagnosis.label + "\n" + d.diagnosis.sameAsLabel;
 			d.group = "Problem";
 			graph.nodes.push(d);
-			graph.links.push({source:0, target:graph.nodes.length-1});
+			graph.links.push({source:2, target:graph.nodes.length-1});
 		});
 
 		vitals.results.forEach(function (d) {
 			d.name = d.vital_type.label + ": " + d.rate.value;
-			d.group = "Vitals";
+			d.group = "Vital";
 			graph.nodes.push(d);
-			graph.links.push({source:0, target:graph.nodes.length-1});
+			graph.links.push({source:3, target:graph.nodes.length-1});
 		});
 var width = 960,
     height = 500;
