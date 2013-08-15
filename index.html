@@ -102,6 +102,16 @@ var svg = d3.select("body").append("svg")
         .attr("cy", function(d) { return d.y; });
   });
 }
+	d3.json("service", function (error, data) {
+		problems=data[0];
+		visits=data[1];
+		vitals=data[2];
+		console.log(visits);
+		console.log(problems);
+		console.log(vitals);
+		patientPlot(visits, problems, vitals);
+	});
+	/*
 	d3.json("visits.json", function (error, visits) {
 		d3.json("problems.json", function (error_1, problems) {
 			d3.json("vitals.json", function (error_2, vitals) {
@@ -112,5 +122,6 @@ var svg = d3.select("body").append("svg")
 			});
 		});
 	});
+	*/
 </script>
 </body>
