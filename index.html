@@ -18,14 +18,16 @@
 <form name="combowithtext">
 <select name="PatientSelector" size="1" onChange="queryPatient(PatientSelector.value)">
 <option value="Select A Patient">Select a Patient</option>
-<option value="198">198</option>
-<option value="12">12</option>
-<option value="115">115</option>
-<option value="300">300</option>
 <option value="1">1</option>
-<option value="60">60</option>
+<option value="12">12</option>
 <option value="25">25</option>
+<option value="60">60</option>
 <option value="99">99</option>
+<option value="115">115</option>
+<option value="198">198</option>
+<option value="300">300</option>
+<option value="711">711</option>
+
 </select>
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script>
@@ -34,27 +36,35 @@
 		console.log(data);
 	});
         */
-	function patientPlot(visits, problems, vitals) {
-		var graph={
-			nodes: [{name: visits.results[0].patient_name.label, group: "Patient"}], 
-			links: []
-		};
+	function patientPlot(visits, problems, vitals,allergies,prescription) {
+    var vitalstime="";
+    var groupvar=1;
+    var graph={
+    nodes: [{name: visits.results[0].patient_name.label, group: "Patient"}],
+    links: []
+    };
 
-		graph.nodes.push({name: "Visits", group:"Visits"});
-		graph.links.push({source:0, target:graph.nodes.length-1});
+    graph.nodes.push({name: "Visits", group:"Visits"});
+    graph.links.push({source:0, target:graph.nodes.length-1});
 
-		graph.nodes.push({name: "Problems", group:"Problems"});
-		graph.links.push({source:0, target:graph.nodes.length-1});
+    graph.nodes.push({name: "Problems", group:"Problems"});
+    graph.links.push({source:0, target:graph.nodes.length-1});
 
-		graph.nodes.push({name: "Vitals", group:"Vitals"});
-		graph.links.push({source:0, target:graph.nodes.length-1});
+    graph.nodes.push({name: "Vitals", group:"Vitals"});
+    graph.links.push({source:0, target:graph.nodes.length-1});
 
-		visits.results.forEach(function (d) {
-			d.name = d.encounter_type.value + "\n" + d.visit_admit_datetime.value;
-			d.group = "Visit";
-			graph.nodes.push(d);
-			graph.links.push({source:1, target:graph.nodes.length-1});
-		});
+    graph.nodes.push({name: "Allergies", group:"Allergies"});
+    graph.links.push({source:0, target:graph.nodes.length-1});
+
+    graph.nodes.push({name: "Prescriptions", group:"Prescriptions"});
+    graph.links.push({source:0, target:graph.nodes.length-1});
+
+    visits.results.forEach(function (d) {
+      d.name = d.encounter_type.value + "\n" + d.visit_admit_datetime.value;
+      d.group = "Visit";
+      graph.nodes.push(d);
+      graph.links.push({source:1, target:graph.nodes.length-1});
+    });
 
 		problems.results.forEach(function (d) {
 			d.name = d.diagnosis.label + "\n" + d.diagnosis.sameAsLabel;
@@ -62,12 +72,18 @@
 			graph.nodes.push(d);
 			graph.links.push({source:2, target:graph.nodes.length-1});
 		});
-
-		vitals.results.forEach(function (d) {
-			d.name = d.vital_type.label + ": " + d.rate.value;
-			d.group = "Vital";
+		allergies.results.forEach(function (d) {
+			d.name = d.gmr_allergy.label + "\n" + d.reactant.value;
+			d.group = "Allergy";
 			graph.nodes.push(d);
-			graph.links.push({source:3, target:graph.nodes.length-1});
+			graph.links.push({source:4, target:graph.nodes.length-1});
+		});
+
+		prescription.results.forEach(function (d) {
+			d.name = d.drug.label + "\n" + d.issue_date.value;
+			d.group = "Prescription";
+			graph.nodes.push(d);
+			graph.links.push({source:5, target:graph.nodes.length-1});
 		});
 var width = 960,
     height = 500;
@@ -121,13 +137,17 @@ var svg = d3.select("body").append("svg")
 }
 function queryPatient(patientIEN){
 	d3.json("service/"+patientIEN, function (error,data) {
-      problems=data[0];
-      visits=data[1];
-      vitals=data[2];
-      console.log(visits);
+      problems     = data[0];
+      visits       = data[1];
+      vitals       = data[2];
+      allergies    = data[3];
+      prescription = data[4];
+      /*console.log(visits);
       console.log(problems);
       console.log(vitals);
-      patientPlot(visits, problems, vitals);
+      console.log(allergies);
+      console.log(prescription);*/
+      patientPlot(visits, problems, vitals, allergies, prescription);
 	});
 };
 	/*
