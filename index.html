@@ -14,6 +14,19 @@
 
 </style>
 <body>
+<center>
+<form name="combowithtext">
+<select name="PatientSelector" size="1" onChange="queryPatient(PatientSelector.value)">
+<option value="Select A Patient">Select a Patient</option>
+<option value="198">198</option>
+<option value="12">12</option>
+<option value="115">115</option>
+<option value="300">300</option>
+<option value="1">1</option>
+<option value="60">60</option>
+<option value="25">25</option>
+<option value="99">99</option>
+</select>
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script>
 	/*
@@ -66,6 +79,10 @@ var force = d3.layout.force()
     .linkDistance(30)
     .size([width, height]);
 
+if(d3.select("body").select("svg")){
+    d3.select("body").select("svg").remove("node");
+    d3.select("body").select("svg").remove("link");
+}
 var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
@@ -102,15 +119,17 @@ var svg = d3.select("body").append("svg")
         .attr("cy", function(d) { return d.y; });
   });
 }
-	d3.json("service", function (error, data) {
-		problems=data[0];
-		visits=data[1];
-		vitals=data[2];
-		console.log(visits);
-		console.log(problems);
-		console.log(vitals);
-		patientPlot(visits, problems, vitals);
+function queryPatient(patientIEN){
+	d3.json("service/"+patientIEN, function (error,data) {
+      problems=data[0];
+      visits=data[1];
+      vitals=data[2];
+      console.log(visits);
+      console.log(problems);
+      console.log(vitals);
+      patientPlot(visits, problems, vitals);
 	});
+};
 	/*
 	d3.json("visits.json", function (error, visits) {
 		d3.json("problems.json", function (error_1, problems) {
