@@ -15,7 +15,9 @@
 </style>
 <body>
 <center>
-<form name="combowithtext">
+<h1>Visualization of CPRS-Demo Patient Data</h1>
+<h2>Part of the "Learning the Language of Healthcare"</h2>
+<form name="patientcombo">
 <select name="PatientSelector" size="1" onChange="queryPatient(PatientSelector.value)">
 <option value="Select A Patient">Select a Patient</option>
 <option value="1">1</option>
@@ -27,7 +29,6 @@
 <option value="198">198</option>
 <option value="300">300</option>
 <option value="711">711</option>
-
 </select>
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script>
@@ -36,7 +37,7 @@
 		console.log(data);
 	});
         */
-	function patientPlot(visits, problems, vitals,allergies,prescription) {
+	function patientPlot(visits, problems, vitals, allergies, prescription) {
     var vitalstime="";
     var groupvar=1;
     var graph={
@@ -86,7 +87,7 @@
 			graph.links.push({source:5, target:graph.nodes.length-1});
 		});
 var width = 960,
-    height = 500;
+    height = 750;
 
 var color = d3.scale.category20();
 
@@ -122,6 +123,7 @@ var svg = d3.select("body").append("svg")
       .style("fill", function(d) { return color(d.group); })
       .call(force.drag);
 
+  svg.select(".node").attr("r",15);
   node.append("title")
       .text(function(d) { return d.name; });
 
