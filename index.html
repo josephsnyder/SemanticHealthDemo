@@ -27,6 +27,7 @@
 <option value="99">99</option>
 <option value="113">113</option>
 <option value="115">115</option>
+<option value="140">140</option>
 <option value="198">198</option>
 <option value="300">300</option>
 <option value="711">711</option>
@@ -38,6 +39,20 @@
     console.log(data);
   });
         */
+
+  function findDateConnections (patientInfoObject,visitObject,graph) {
+    var foundindex=0;
+    common={name: visitObject.visit_admit_datetime.value, group: "CommonDates"}
+    for (var i=0;i<graph.nodes.length;i++) {
+      if(graph.nodes[i].name === common.name) {
+        foundindex = i;
+      }
+    };
+    if (foundindex == 0) {graph.nodes.push(common); foundindex = graph.nodes.length-1;};
+    graph.links.push({source:graph.nodes[foundindex], target:graph.nodes.indexOf(visitObject)});
+    graph.links.push({source:graph.nodes[foundindex], target:graph.nodes.indexOf(patientInfoObject)});
+  };
+
   function patientPlot(visits, problems, vitals, allergies, prescription, immunizations, cpt) {
     var vitalstime="";
     var groupvar=1;
@@ -79,6 +94,11 @@
       d.group = "Vital";
       graph.nodes.push(d);
       graph.links.push({source:3, target:graph.nodes.length-1});
+      visits.results.forEach(function (x) {
+          if(d.date_time_vitals_taken.value == x.visit_admit_datetime.value) {
+            findDateConnections(d,x,graph)
+          }
+      });
     });
 
     problems.results.forEach(function (d) {
@@ -86,13 +106,27 @@
       d.group = "Problem";
       graph.nodes.push(d);
       graph.links.push({source:2, target:graph.nodes.length-1});
+      visits.results.forEach(function (x, i) {
+        if(d.date_entered.value == x.visit_admit_datetime.value) {
+            findDateConnections(d,x,graph)
+        }
+      });
     });
 
+    console.log(allergies);
     allergies.results.forEach(function (d) {
       d.name = d.gmr_allergy.label + "\n" + d.reactant.value;
       d.group = "Allergy";
       graph.nodes.push(d);
       graph.links.push({source:4, target:graph.nodes.length-1});
+      visits.results.forEach(function (x, i) {
+          try {
+            if(d.verification_date_time.value == x.visit_admit_datetime.value) {
+              findDateConnections(d,x,graph)
+            }
+          }
+          catch(e){};
+      });
     });
 
     prescription.results.forEach(function (d) {
@@ -100,6 +134,11 @@
       d.group = "Prescription";
       graph.nodes.push(d);
       graph.links.push({source:5, target:graph.nodes.length-1});
+      visits.results.forEach(function (x) {
+          if(d.issue_date.value == x.visit_admit_datetime.value) {
+            findDateConnections(d,x,graph)
+          }
+      });
     });
 
     immunizations.results.forEach(function (d) {
@@ -107,6 +146,11 @@
       d.group = "Immunization";
       graph.nodes.push(d);
       graph.links.push({source:6, target:graph.nodes.length-1});
+      visits.results.forEach(function (x, i) {
+          if(d.visit.label == "VISIT/" + x.visit_admit_datetime.value) {
+            findDateConnections(d,x,graph)
+          }
+      });
     });
 
     cpt.results.forEach(function (d) {
@@ -114,6 +158,11 @@
       d.group = "CPT Code";
       graph.nodes.push(d);
       graph.links.push({source:7, target:graph.nodes.length-1});
+      visits.results.forEach(function (x, i) {
+          if(d.visit.label == "VISIT/" + x.visit_admit_datetime.value) {
+            findDateConnections(d,x,graph)
+          };
+      });
     });
 
 var width = 960,
